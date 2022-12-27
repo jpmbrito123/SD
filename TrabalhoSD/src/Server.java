@@ -24,7 +24,24 @@ public class Server {
         }
     }
 
-    public List<List<Integer>> trotinetes_livres(int x,int y){}
+    public List<List<Integer>> trotinetes_livres(int x,int y){
+        List<List<Integer>> livres= new ArrayList<>();
+        for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
+            if (l>=0){
+                for(int c=x-this.distancia;c<x+this.distancia && c<this.tamanho;c++){
+                    if(c>=0){
+                        Trotinete trotinete = this.mapa.get(l).get(c);
+                        if (trotinete.isLivre()){
+                            List<Integer> cords = new ArrayList<>(trotinete.getCorX());
+                            cords.add(trotinete.getCorY());
+                            livres.add(cords);
+                        }
+                    }
+                }
+            }
+        }
+        return livres;
+    }
 
     public List<List<Integer>> recompensas(){}
 
