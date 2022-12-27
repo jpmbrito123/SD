@@ -45,5 +45,12 @@ public class Server {
 
     public List<List<Integer>> recompensas(){}
 
-    public void reserva_trotinete(int x ,int y){}
+    public void reserva_trotinete(int x ,int y){
+        if (x>=0 && x<this.tamanho && y>=0 && y<this.tamanho){
+            Trotinete t = this.mapa.get(y).get(x);
+                    if (t != null){
+                        t.reserva();
+                    }
+        }
+    }
 }
