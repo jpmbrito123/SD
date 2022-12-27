@@ -16,14 +16,14 @@ public class Server {
                 mapa.get(i).add(null);
             }
         }
-
-        for (Trotinete t : this.trotinetes) {
-            int x = t.getCorX();
-            int y = t.getCorY();
-            mapa.get(y).add(x, t);
-        }
     }
 
+    public void adiciona_trotinete(Trotinete t){
+        trotinetes.add(t);
+        int x = t.getCorX();
+        int y = t.getCorY();
+        mapa.get(y).add(x, t);
+    }
     public List<List<Integer>> trotinetes_livres(int x,int y){
         List<List<Integer>> livres= new ArrayList<>();
         for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
