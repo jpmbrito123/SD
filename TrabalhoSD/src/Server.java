@@ -9,12 +9,17 @@ public class Server {
     final Integer distancia = 2;
     final Integer tamanho = 20;
 
-    public void criaMapa(){
+    public Server(List<Trotinete> trotinetes) {
         for(int i = 0; i<this.tamanho; i++){
-            mapa.add(new ArrayList<>());
+            this.mapa.add(new ArrayList<>());
             for(int j = 0; j<this.tamanho; j++){
-                mapa.get(i).add(null);
+                this.mapa.get(i).add(null);
             }
+        }
+
+        this.trotinetes = trotinetes;
+        for (Trotinete t:this.trotinetes){
+            this.adiciona_trotinete(t);
         }
     }
 
@@ -50,6 +55,7 @@ public class Server {
             Trotinete t = this.mapa.get(y).get(x);
                     if (t != null){
                         t.reserva();
+                        this.mapa.get(y).add(x,null);
                     }
         }
     }
