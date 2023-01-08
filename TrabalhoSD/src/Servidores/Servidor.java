@@ -1,5 +1,7 @@
 package Servidores;
 
+import Clientes.TaggedConnection;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.*;
+
+import static java.lang.Integer.parseInt;
 
 public class Servidor {
     public App aplication = new App();
@@ -35,21 +39,25 @@ public class Servidor {
         }
     }
 
-    public void clientes (Socket s) {
+    public void clientes (Socket s) throws IOException {
+        TaggedConnection c = new TaggedConnection(s);
         Thread espera_notificacao = null;
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
             while (true){
-                int i = in.read();
-                if(i==1){
-                    int x = in.read();
-                    int y = in.read();
+                TaggedConnection.Frame frame = c.receive();
+                String data = new String(frame.data);
+                if(frame.tag == 1){
+                }else if(frame.tag == 2) {
+                }else if(frame.tag == 3){
+                    String[] tokens = data.split(" ");
+                    int x =  parseInt(tokens[0]);
+                    int y = parseInt(tokens[1]);
                     this.aplication.trotinetes_livres(x,y);
-                }else if(1==2){
-                } else if (1==3) {
-                    int x = in.read();
-                    int y = in.read();
+                }else if(frame.tag == 4){
+                } else if (frame.tag == 5) {
+                    String[] tokens = data.split(" ");
+                    int x =  parseInt(tokens[0]);
+                    int y = parseInt(tokens[1]);
                     try {
                         this.writel.lock();
                         while (atualiza){
@@ -63,10 +71,11 @@ public class Servidor {
                     } finally {
                         this.writel.unlock();
                     }
-                } else if (i==4) {
-                    int x = in.read();
-                    int y = in.read();
-                    int codigo = in.read();
+                } else if (frame.tag == 6) {
+                    String[] tokens = data.split(" ");
+                    int x =  parseInt(tokens[0]);
+                    int y = parseInt(tokens[1]);
+                    int codigo = parseInt(tokens[2]);
                     try {
                         this.writel.lock();
                         while (atualiza){
@@ -80,14 +89,22 @@ public class Servidor {
                     } finally {
                         this.writel.unlock();
                     }
-                } else if (i==5) {
-                if (espera_notificacao == null){
-                        espera_notificacao = new Thread(()->{espera_notificacoes(out);});
-                        espera_notificacao.start();}
-                } else if (i==6) {
+                } else if (frame.tag == 7) {
+                    if (espera_notificacao == null){
+                        espera_notificacao = new Thread(()->{espera_notificacoes(c);});
+                        espera_notificacao.start();
+                        c.send(7,Integer.toString(0).getBytes());
+                    }else {
+                        c.send(7,Integer.toString(-1).getBytes());
+                    }
+                } else if (frame.tag == 8) {
                     if (espera_notificacao != null) {
                         espera_notificacao.interrupt();
-                        espera_notificacao = null;}
+                        espera_notificacao = null;
+                        c.send(8,Integer.toString(0).getBytes());
+                    }else {
+                        c.send(8,Integer.toString(-1).getBytes());
+                    }
                 }
             }
         } catch (IOException e) {
@@ -95,7 +112,7 @@ public class Servidor {
         }
     }
 
-    private void espera_notificacoes(PrintWriter out) {
+    private void espera_notificacoes(TaggedConnection c) {
         while (true){
             try {
                 this.readl.lock();
@@ -136,7 +153,13 @@ public class Servidor {
         ServerSocket ss = new ServerSocket(1100);
         while (true){
             Socket s = ss.accept();
-            Thread cliente = new Thread(() -> {clientes(s);});
+            Thread cliente = new Thread(() -> {
+                try {
+                    clientes(s);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             cliente.start();
         }
     }
