@@ -35,4 +35,7 @@ public class Trotinete {
     public void setLivre(boolean livre) {
         this.livre = livre;
     }
+
+    public void reserva() {
+    }
 }
