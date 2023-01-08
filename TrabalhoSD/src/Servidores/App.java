@@ -114,4 +114,7 @@ public class App {
             }
         }
     }
+
+    public void liverta_trotinete(int x, int y) {
+    }
 }
