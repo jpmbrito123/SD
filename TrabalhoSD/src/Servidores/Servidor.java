@@ -16,12 +16,11 @@ public class Servidor {
 
     public ReentrantReadWriteLock lockc = new ReentrantReadWriteLock();
 
-    public Lock readLock = lockc.readLock();
-    public Lock writeLock = lockc.writeLock();
-    public Condition pode_notificar = readLock.newCondition();
-    public Condition pode_atualizar = writeLock.newCondition();
+    public Lock readl = lockc.readLock();
+    public Lock writel = lockc.writeLock();
+    public Condition pode_atualizar = writel.newCondition();
 
-    public Condition pode_trotrinetes = writeLock.newCondition();
+    public Condition atualizou = writel.newCondition();
     public boolean atualiza;
 
 
@@ -52,9 +51,9 @@ public class Servidor {
                     int x = in.read();
                     int y = in.read();
                     try {
-                        this.writeLock.lock();
+                        this.writel.lock();
                         while (atualiza){
-                            this.pode_notificar.await();
+                            this.atualizou.await();
                         }
                         this.atualiza = true;
                         this.aplication.reserva_trotinete(x,y);
@@ -62,23 +61,24 @@ public class Servidor {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
-                        this.writeLock.unlock();
+                        this.writel.unlock();
                     }
                 } else if (i==4) {
                     int x = in.read();
                     int y = in.read();
+                    int codigo = in.read();
                     try {
-                        this.writeLock.lock();
+                        this.writel.lock();
                         while (atualiza){
-                            this.pode_notificar.await();
+                            this.atualizou.await();
                         }
                         this.atualiza = true;
-                        this.aplication.liverta_trotinete(x,y);
+                        this.aplication.liverta_trotinete(x,y,codigo);
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
-                        this.writeLock.unlock();
+                        this.writel.unlock();
                     }
                 } else if (i==5) {
                 if (espera_notificacao == null){
@@ -98,14 +98,14 @@ public class Servidor {
     private void espera_notificacoes(PrintWriter out) {
         while (true){
             try {
-                this.readLock.lock();
+                this.readl.lock();
                 while (atualiza){
-                    this.pode_notificar.await();
+                    this.atualizou.await();
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }finally {
-                this.readLock.unlock();
+                this.readl.unlock();
             }
         }
     }
@@ -113,7 +113,7 @@ public class Servidor {
     private void recompensas(){
         while (true){
             try {
-                writeLock.lock();
+                writel.lock();
                 while (!this.atualiza){
                     this.pode_atualizar.await();
                 }
@@ -121,12 +121,11 @@ public class Servidor {
                 this.A.clear();
                 this.B.clear();
                 this.aplication.recompensas(A,B);
-                this.pode_trotrinetes.signalAll();
-                this.pode_notificar.signalAll();
+                this.atualizou.signalAll();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } finally {
-                writeLock.lock();
+                writel.lock();
             }
         }
     }

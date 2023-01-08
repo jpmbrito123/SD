@@ -38,8 +38,8 @@ public class App {
                         List<Trotinete> trotinetes = this.mapa.get(l).get(c);
                         for (Trotinete trotinete: trotinetes) {
                             if (trotinete.isLivre()) {
-                                List<Integer> cords = new ArrayList<>(trotinete.getCorX());
-                                cords.add(trotinete.getCorY());
+                                List<Integer> cords = new ArrayList<>(c);
+                                cords.add(l);
                                 livres.add(cords);
                                 break;
                             }
@@ -56,11 +56,15 @@ public class App {
         for(int y=0;y<this.tamanho;y++){
             for(int x=0;x<this.tamanho;x++){
                 trotinetes = this.mapa.get(y).get(x);
-                if (trotinetes.size()>1){
+                int n_livre=0;
+                for(Trotinete t:trotinetes){
+                    if(t.isLivre())n_livre++;
+                }
+                if (n_livre>1){
                     List<Integer> cords = new ArrayList<>(x);
                     cords.add(y);
                     A.add(cords);
-                } else if (trotinetes.size()==0) {
+                } else if (n_livre==0) {
                     boolean b = true;
                     for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
                         if (l>=0){
@@ -89,7 +93,7 @@ public class App {
         }
     }
 
-    public void reserva_trotinete(int x ,int y){
+    public int reserva_trotinete(int x ,int y){
         Trotinete t = null;
         if (x >= 0 && x < this.tamanho && y >= 0 && y < this.tamanho) {
             for (int n = 0;n<this.distancia;n++) {
@@ -101,7 +105,6 @@ public class App {
                                 for (Trotinete trotinete: trotinetes) {
                                     t = trotinete;
                                     t.reserva();
-                                    this.mapa.get(y).add(x, null);
                                     break;
                                     }
                                 }
@@ -113,8 +116,18 @@ public class App {
                 if (t!=null) break;
             }
         }
+        int codigo = -1;
+        if (t!=null) codigo= t.getId();
+        return codigo;
     }
 
-    public void liverta_trotinete(int x, int y) {
+    public void liverta_trotinete(int x, int y,int codigo) {
+        List<Trotinete> trotinetes = this.mapa.get(y).get(x);
+        for(Trotinete t:trotinetes){
+            if(t.getId()==codigo){
+                t.setLivre(true);
+                break;
+            }
+        }
     }
 }
