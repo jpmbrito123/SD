@@ -14,7 +14,7 @@ public class Menu {
 
     /** Functional interface para handlers. */
     public interface Handler {
-        void execute();
+        void execute() throws InterruptedException;
     }
 
     /** Functional interface para pré-condições. */
@@ -143,7 +143,11 @@ public class Menu {
             System.out.println("Opção indisponível!");
         } else if (op>0) {
             // executar handler
-            this.handlers.get(op-1).execute();
+            try {
+                this.handlers.get(op-1).execute();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -152,7 +156,7 @@ public class Menu {
      *
      * Termina com a opção 0 (zero).
      */
-    public void run() {
+    public void run()  {
         int op;
         do {
             show();
@@ -162,7 +166,11 @@ public class Menu {
                 System.out.println("Opção indisponível! Tente novamente.");
             } else if (op>0) {
                 // executar handler
-                this.handlers.get(op-1).execute();
+                try {
+                    this.handlers.get(op-1).execute();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } while (op != 0);
     }

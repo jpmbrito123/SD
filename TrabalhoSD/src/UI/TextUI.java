@@ -51,7 +51,6 @@ public class TextUI {
 
     // Métodos auxiliares
     private void trataRegistar() throws InterruptedException {
-        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         Thread t = new Thread(() -> {
             try {
                 System.out.println("Inserir nome utilizador: ");
@@ -77,26 +76,34 @@ public class TextUI {
         t.start();
         t.join();
     }
-    private void trataFazerLogin() {
-        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+    private void trataFazerLogin() throws InterruptedException {
         Thread t = new Thread(()-> {
-            try {
-            System.out.println("Insira nome utilizador: ");
-            String nome = scin.nextLine();
-
-                System.out.println("Insira palavra passe: ");
+            try{
+                System.out.println("Inserir nome utilizador: ");
+                String nomeUtilizador = scin.nextLine();
+                System.out.print("Inserir palavra-passe: ");
                 String passe = scin.nextLine();
-                    System.out.println("Login efetuado com sucesso");
+
+                multi.send(1, (nomeUtilizador+" "+passe).getBytes());
+
+                byte[] reply = multi.receive(1);
+                int error = Integer.parseInt(new String(reply));
+                byte[] reply1 = multi.receive(1);
+                System.out.println("\n");
+                if(error==0){
+                    String[] tokens = new String(reply1).split("-");
+                    System.out.print(tokens[0] + "\n\n\n");
+                    c.setNome(nomeUtilizador);
                     new Text2UI().run();
-                }else{
-                    System.out.println("Palavra passe errada");
-                }
-            } else {
-                System.out.println("Esse nome de utilizador não existe!");
+                }else
+                    System.out.println("\033[0;31m" + new String(reply1) + ": Falha na autenticação" + "\n\n\033[0m");
             }
-        }
-        catch (NullPointerException e) {
-            System.out.println(e.getMessage());
-        }
+            catch (NullPointerException | IOException | InterruptedException e) {
+                System.out.print(e.getMessage() + "\n\n");
+            }
+        });
+        t.start();
+        t.join();
     }
+
 }
