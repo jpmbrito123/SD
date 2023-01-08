@@ -2,6 +2,8 @@ package Servidores;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.nextUp;
@@ -10,6 +12,12 @@ public class App {
     List<List<List<Trotinete>>> mapa= new ArrayList<>();
 
     List<Trotinete> trotinetes = new ArrayList<>();
+
+    public ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public Lock readlock = lock.readLock();
+
+    public Lock writlock = lock.writeLock();
 
     final Integer distancia = 2;
     final Integer tamanho = 20;
