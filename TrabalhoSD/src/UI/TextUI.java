@@ -2,7 +2,9 @@ package UI;
 
 import Clientes.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class TextUI {
 
-
+    private Cliente c;
     private Demultiplexer multi;
     // Menus da aplicação
     private Menu menu;
@@ -48,27 +50,42 @@ public class TextUI {
     }
 
     // Métodos auxiliares
-    private void trataRegistar() {
-        try {
-            System.out.println("Inserir nome utilizador: ");
-            String nomeUtilizador = scin.nextLine();
+    private void trataRegistar() throws InterruptedException {
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        Thread t = new Thread(() -> {
+            try {
+                System.out.println("Inserir nome utilizador: ");
+                String nomeUtilizador = scin.nextLine();
 
-            System.out.println("Palavra passe do novo utilizador: ");
-            String passe = scin.nextLine();
-            multi.send(2,(nomeUtilizador + " "+ passe).getBytes());
-            System.out.println("Utilizador registado adicionado");
-
-        }catch (NullPointerException | IOException e) {
-            System.out.print(e.getMessage() + "\n\n");
+                System.out.println("Palavra passe do novo utilizador: ");
+                String passe = scin.nextLine();
+                multi.send(2,(nomeUtilizador + " "+ passe).getBytes());
+                byte[] reply = multi.receive(2);
+                int error =  Integer.parseInt(new String(reply));
+                byte[] reply1 = multi.receive(2);
+                if(error==0){
+                    System.out.println(new String(reply1) + "\n\n");
+                    c.setNome(nomeUtilizador);
+                    new Text2UI().run();
+                }else{
+                    System.out.print("\033[0;31m" + new String(reply1) + ": Registo não efetuado!!" + "\n\n\033[0m");
+                }
+            }catch (NullPointerException | IOException |InterruptedException e) {
+                System.out.print(e.getMessage() + "\n\n");
+            }
+        });
+        t.start();
+        t.join();
     }
     private void trataFazerLogin() {
-        try {
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        Thread t = new Thread(()-> {
+            try {
             System.out.println("Insira nome utilizador: ");
             String nome = scin.nextLine();
-            if (this.modelUtilizador.existeUtilizador(nome)) {
+
                 System.out.println("Insira palavra passe: ");
                 String passe = scin.nextLine();
-                if (this.modelUtilizador.passecorreta(nome,passe)){
                     System.out.println("Login efetuado com sucesso");
                     new Text2UI().run();
                 }else{
