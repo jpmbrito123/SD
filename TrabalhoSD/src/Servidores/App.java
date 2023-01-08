@@ -1,3 +1,5 @@
+package Servidores;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,7 @@ public class App {
                                 List<Integer> cords = new ArrayList<>(trotinete.getCorX());
                                 cords.add(trotinete.getCorY());
                                 livres.add(cords);
+                                break;
                             }
                         }
                     }
@@ -53,7 +56,43 @@ public class App {
         return livres;
     }
 
-    public List<List<Integer>> recompensas(){return null;}
+    public void recompensas(List<List<Integer>> A,List<List<Integer>> B){
+        List<Trotinete> trotinetes;
+        for(int y=0;y<this.tamanho;y++){
+            for(int x=0;x<this.tamanho;x++){
+                trotinetes = this.mapa.get(y).get(x);
+                if (trotinetes.size()>1){
+                    List<Integer> cords = new ArrayList<>(x);
+                    cords.add(y);
+                    A.add(cords);
+                } else if (trotinetes.size()==0) {
+                    boolean b = true;
+                    for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
+                        if (l>=0){
+                            for(int c=x-this.distancia;c<x+this.distancia && c<this.tamanho;c++){
+                                if(c>=0 && this.distancia>=abs(l-y)+abs(c-x) ){
+                                    List<Trotinete> trotinetesss = this.mapa.get(l).get(c);
+                                    for (Trotinete trotinete: trotinetesss) {
+                                        if (trotinete.isLivre()) {
+                                            b = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!b) break;
+                            }
+                        }
+                        if(!b) break;
+                    }
+                    if(b) {
+                        List<Integer> cords = new ArrayList<>(x);
+                        cords.add(y);
+                        B.add(cords);
+                    }
+                }
+            }
+        }
+    }
 
     public void reserva_trotinete(int x ,int y){
         Trotinete t = null;
