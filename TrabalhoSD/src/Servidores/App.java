@@ -14,17 +14,12 @@ public class App {
     final Integer distancia = 2;
     final Integer tamanho = 20;
 
-    public App(List<Trotinete> trotinetes) {
+    public App() {
         for(int i = 0; i<this.tamanho; i++){
             this.mapa.add(new ArrayList<>());
             for(int j = 0; j<this.tamanho; j++){
                 this.mapa.get(i).add(new ArrayList<Trotinete>());
             }
-        }
-
-        this.trotinetes = trotinetes;
-        for (Trotinete t:this.trotinetes){
-            this.adiciona_trotinete(t);
         }
     }
 

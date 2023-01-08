@@ -6,6 +6,13 @@ public class Trotinete {
     private int corY;
     private boolean livre;
 
+    public Trotinete(int id, int corX, int corY, boolean livre) {
+        this.id = id;
+        this.corX = corX;
+        this.corY = corY;
+        this.livre = livre;
+    }
+
     public int getId() {
         return id;
     }
