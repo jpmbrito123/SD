@@ -66,7 +66,7 @@ public class TextUI {
                 if(error==0){
                     System.out.println(new String(reply1) + "\n\n");
                     c.setNome(nomeUtilizador);
-                    new Text2UI().run();
+                    new Text2UI(multi).run();
                 }else{
                     System.out.print("\033[0;31m" + new String(reply1) + ": Registo não efetuado!!" + "\n\n\033[0m");
                 }
@@ -95,7 +95,7 @@ public class TextUI {
                     String[] tokens = new String(reply1).split("-");
                     System.out.print(tokens[0] + "\n\n\n");
                     c.setNome(nomeUtilizador);
-                    new Text2UI().run();
+                    new Text2UI(multi).run();
                 }else
                     System.out.println("\033[0;31m" + new String(reply1) + ": Falha na autenticação" + "\n\n\033[0m");
             }

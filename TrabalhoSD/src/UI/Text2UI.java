@@ -2,6 +2,7 @@ package UI;
 
 import Clientes.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,13 +16,16 @@ public class Text2UI {
 
     // Scanner para leitura
     private Scanner scin;
+    
+    private Demultiplexer multi;
 
     /**
      * Construtor.
      * <p>
      * Cria os menus e a camada de negócio.
      */
-    public Text2UI() {
+    public Text2UI(Demultiplexer multi) {
+        this.multi = multi;
         // Criar o menu
         this.menu = new Menu(new String[]{
                 "Ver Trotinetes Livres",
@@ -38,10 +42,21 @@ public class Text2UI {
         this.menu.setHandler(4, this::trataEstacionar);
         this.menu.setHandler(5, this::trataPedirNotificacoes);
         this.menu.setHandler(6, this::trataDesativarNotificacoes);
-        this.modelUtilizador = new ClienteFacade();
         scin = new Scanner(System.in);
     }
-    
+
+    private void trataListaRecompenas() {
+    }
+
+    private void trataDesativarNotificacoes() {
+    }
+
+    private void trataPedirNotificacoes() {
+    }
+
+    private void trataEstacionar() {
+    }
+
     public void trataTrotinetesLivres(){
         Thread t = new Thread(() -> {
             try{
