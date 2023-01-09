@@ -62,13 +62,11 @@ public class TextUI {
                 multi.send(2,(nomeUtilizador + " "+ passe).getBytes());
                 byte[] reply = multi.receive(2);
                 int error =  Integer.parseInt(new String(reply));
-                byte[] reply1 = multi.receive(2);
                 if(error==0){
-                    System.out.println(new String(reply1) + "\n\n");
                     c.setNome(nomeUtilizador);
                     new Text2UI(multi).run();
                 }else{
-                    System.out.print("\033[0;31m" + new String(reply1) + ": Registo não efetuado!!" + "\n\n\033[0m");
+                    System.out.print("\033[0;31m" + ": Registo não efetuado!!" + "\n\n\033[0m");
                 }
             }catch (NullPointerException | IOException |InterruptedException e) {
                 System.out.print(e.getMessage() + "\n\n");
@@ -89,15 +87,12 @@ public class TextUI {
 
                 byte[] reply = multi.receive(1);
                 int error = Integer.parseInt(new String(reply));
-                byte[] reply1 = multi.receive(1);
-                System.out.println("\n");
                 if(error==0){
-                    String[] tokens = new String(reply1).split(" ");
-                    System.out.print(tokens[0] + "\n\n\n");
+                    System.out.print("Sucesso na autenticação" + "\n\n\n");
                     c.setNome(nomeUtilizador);
                     new Text2UI(multi).run();
                 }else
-                    System.out.println("\033[0;31m" + new String(reply1) + ": Falha na autenticação" + "\n\n\033[0m");
+                    System.out.println("\033[0;31m" + ": Falha na autenticação" + "\n\n\033[0m");
             }
             catch (NullPointerException | IOException | InterruptedException e) {
                 System.out.print(e.getMessage() + "\n\n");

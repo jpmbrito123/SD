@@ -65,8 +65,8 @@ public class Servidor {
                     }finally {
                         this.lock.unlock();
                     }
-                    if (b) c.send(0,"0".getBytes());
-                    else c.send(0,"-1".getBytes());
+                    if (b) c.send(1,"0".getBytes());
+                    else c.send(1,"-1".getBytes());
                 }else if(frame.tag == 2) {
                     boolean b = false;
                     String[] tokens = data.split(" ");
@@ -79,8 +79,8 @@ public class Servidor {
                     }finally {
                         this.lock.unlock();
                     }
-                    if (b) c.send(0,"0".getBytes());
-                    else c.send(0,"-1".getBytes());
+                    if (b) c.send(2,"0".getBytes());
+                    else c.send(2,"-1".getBytes());
                 }else if(frame.tag == 3){
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);

@@ -57,8 +57,8 @@ public class App {
                 if (l>=0){
                     for(int c=x-this.distancia;c<=x+this.distancia && c<this.tamanho;c++){
                         if(c>=0 && this.distancia>=abs(l-y)+abs(c-x) ){
-                            List<Trotinete> trotinetes = this.mapa.get(l).get(c);
-                            for (Trotinete trotinete: trotinetes) {
+                            List<Trotinete> trotinetes_1 = this.mapa.get(l).get(c);
+                            for (Trotinete trotinete: trotinetes_1) {
                                 if (trotinete.isLivre()) {
                                     List<Integer> cords = new ArrayList<>();
                                     cords.add(c);
@@ -83,9 +83,9 @@ public class App {
             this.readlock.lock();
             for(int y=0;y<this.tamanho;y++){
                 for(int x=0;x<this.tamanho;x++){
-                    trotinetes = this.mapa.get(y).get(x);
+                    List<Trotinete> trotinetes_1 = this.mapa.get(y).get(x);
                     int n_livre=0;
-                    for(Trotinete t:trotinetes){
+                    for(Trotinete t:trotinetes_1){
                         if(t.isLivre())n_livre++;
                     }
                     if (n_livre>1){
@@ -136,9 +136,9 @@ public class App {
                 if (l >= 0) {
                     for (int c = X - this.distancia; c <= X + this.distancia && c < this.tamanho; c++) {
                         if (c >= 0 && this.distancia >= abs(l - Y) + abs(c - X)) {
-                            trotinetes = this.mapa.get(l).get(c);
+                            List<Trotinete> trotinetes_1 = this.mapa.get(l).get(c);
                             int n_livre=0;
-                            for(Trotinete t:trotinetes){
+                            for(Trotinete t:trotinetes_1){
                                 if(t.isLivre())n_livre++;
                             }
                             if (n_livre>1){
@@ -154,9 +154,9 @@ public class App {
 
             for(int y=0;y<this.tamanho;y++){
                 for(int x=0;x<this.tamanho;x++){
-                    trotinetes = this.mapa.get(y).get(x);
+                    List<Trotinete> trotinetes_1 = this.mapa.get(y).get(x);
                     int n_livre=0;
-                    for(Trotinete t:trotinetes){
+                    for(Trotinete t:trotinetes_1){
                         if(t.isLivre())n_livre++;
                     }
                     if (n_livre==0) {
@@ -211,8 +211,8 @@ public class App {
                         if (l >= 0) {
                             for (int c = x - n; c <= x + n && c < this.tamanho; c++) {
                                 if (c >= 0 && n >= abs(l - y) + abs(c - x)) {
-                                    List<Trotinete> trotinetes = this.mapa.get(l).get(c);
-                                    for (Trotinete trotinete : trotinetes) {
+                                    List<Trotinete> trotinetes_1 = this.mapa.get(l).get(c);
+                                    for (Trotinete trotinete : trotinetes_1) {
                                         t = trotinete;
                                         t.reserva();
                                         break;
@@ -246,12 +246,10 @@ public class App {
         if (x>=0 && y>=0 && x<this.tamanho && y<this.tamanho) {
             try {
                 this.writlock.lock();
-                System.out.println(codigo);
                 for (Trotinete t : this.trotinetes) {
-                    System.out.println(t.getId());
                     if (t.getId() == codigo) {
-                        List<Trotinete> trotinetes = this.mapa.get(t.getCorY()).get(t.getCorX());
-                        for (Trotinete ts : trotinetes) {
+                        List<Trotinete> trotinetes_1 = this.mapa.get(t.getCorY()).get(t.getCorX());
+                        for (Trotinete ts : trotinetes_1) {
                             if (ts.getId() == codigo) {
                                 ts.setLivre(true);
                                 break;

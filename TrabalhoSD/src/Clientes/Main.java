@@ -12,7 +12,7 @@ public class Main {
         Demultiplexer multi = new Demultiplexer( new TaggedConnection(socket));
         Cliente c = new Cliente("","",multi);
         multi.start();
-        new Text2UI(multi).run();
+        new TextUI(multi,c).run();
         socket.close();
     }
 }
