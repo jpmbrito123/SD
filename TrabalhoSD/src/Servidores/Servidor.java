@@ -87,20 +87,25 @@ public class Servidor {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
-                    int codigo = parseInt(tokens[2]);
+                    String reserva = tokens[2];
+                    String[] reserva_tokens = reserva.split(" ");
+                    boolean b =false;
                     try {
                         this.writel.lock();
                         while (atualiza){
                             this.atualizou.await();
                         }
                         this.atualiza = true;
-                        this.aplication.liverta_trotinete(x,y,codigo);
+                        b = this.aplication.liverta_trotinete(x,y,Integer.parseInt(reserva_tokens[0]));
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
                         this.writel.unlock();
                     }
+                    if (b){//falta pagamento
+                        c.send(6,Integer.toString(0).getBytes());
+                    }else c.send(6,Integer.toString(-1).getBytes());
                 } else if (frame.tag == 7) {
                     if (espera_notificacao == null){
                         espera_notificacao = new Thread(()->{espera_notificacoes(c);});

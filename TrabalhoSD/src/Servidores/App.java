@@ -161,19 +161,29 @@ public class App {
         return reserva;
     }
 
-    public void liverta_trotinete(int x, int y,int codigo) {
+    public boolean liverta_trotinete(int x, int y,int codigo) {
+        boolean b = false;
         try {
             this.writlock.lock();
-            List<Trotinete> trotinetes = this.mapa.get(y).get(x);
-            for(Trotinete t:trotinetes){
-                if(t.getId()==codigo){
-                    t.setLivre(true);
+            for (Trotinete t: this.trotinetes){
+                if (t.getId()==codigo){
+                    List<Trotinete> trotinetes = this.mapa.get(t.getCorY()).get(t.getCorX());
+                    for(Trotinete ts:trotinetes){
+                        if(ts.getId()==codigo){
+                            ts.setLivre(true);
+                            break;
+                        }
+                    }
+                    this.mapa.get(t.getCorY()).get(t.getCorX()).remove(t);
+                    this.mapa.get(y).get(x).add(t);
+                    b = true;
                     break;
                 }
             }
         }finally {
             this.writlock.unlock();
         }
+        return b;
     }
     public String trotinetesToString(List<List<Integer>> l){
         StringBuilder s = new StringBuilder();
