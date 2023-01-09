@@ -16,17 +16,20 @@ public class Text2UI {
     private Scanner scin;
 
     private String senha;
-    
+
     private Demultiplexer multi;
 
     private final Thread thread = new Thread(()->{try {
-        multi.send(7,"Ativar Notificacao".getBytes());
+        System.out.println("Indique as suas coordenadas");
+        int x = this.scin.nextInt();
+        int y = this.scin.nextInt();
+        multi.send(7,(x+" "+y).getBytes());
         byte[] reply = multi.receive(7);
         int error = Integer.parseInt(new String(reply));
         if(error==0){
             System.out.println("Notificaçoes ativadas");
         }
-        else this.thread.join();
+        else this.thread.interrupt();
 
     }
     catch (NullPointerException | IOException | InterruptedException e){
@@ -60,7 +63,32 @@ public class Text2UI {
         scin = new Scanner(System.in);
     }
 
-    private void trataListaRecompenas() {
+    private void trataListaRecompenas() throws InterruptedException {
+        Thread t = new Thread(() -> {
+           try{
+               System.out.println("Insira as suas coordenadas: ");
+               int x = scin.nextInt();
+               int y = scin.nextInt();
+               multi.send(4, (x + " " + y).getBytes());
+               byte[] reply = multi.receive(4);
+               int error = Integer.parseInt(new String(reply));
+               System.out.println("\n\n");
+               if (error==0){
+                   byte[] reply1 = multi.receive(4);
+                   String aux = new String(reply1);
+                   System.out.println(aux);
+               }
+               else
+                   System.out.println("\033[0;31m" + ": Falha ao encontrar recompensas" + "\n\n\033[0m");
+
+           }
+           catch (NullPointerException | IOException | InterruptedException e){
+               System.out.print(e.getMessage() + "\n\n");
+
+           }
+        });
+        t.start();
+        t.join();
     }
 
     private void trataDesativarNotificacoes() {
@@ -82,8 +110,15 @@ public class Text2UI {
     }
 
 
-    private void trataPedirNotificacoes() {
-        this.thread.start();
+    private void trataPedirNotificacoes() throws InterruptedException {
+        try {
+            this.thread.start();
+            this.thread.join();
+        }
+        catch (NullPointerException | InterruptedException e){
+            System.out.print(e.getMessage() + "\n\n");
+
+        }
     }
 
     private void trataEstacionar() throws InterruptedException {
@@ -141,7 +176,7 @@ public class Text2UI {
         t.start();
         t.join();
     }
-    
+
     public void trataReservarTrotinete() throws InterruptedException {
         Thread t = new Thread(() -> {
             try {
