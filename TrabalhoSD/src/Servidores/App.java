@@ -56,7 +56,8 @@ public class App {
                             List<Trotinete> trotinetes = this.mapa.get(l).get(c);
                             for (Trotinete trotinete: trotinetes) {
                                 if (trotinete.isLivre()) {
-                                    List<Integer> cords = new ArrayList<>(c);
+                                    List<Integer> cords = new ArrayList<>();
+                                    cords.add(c);
                                     cords.add(l);
                                     livres.add(cords);
                                     break;
@@ -84,7 +85,8 @@ public class App {
                         if(t.isLivre())n_livre++;
                     }
                     if (n_livre>1){
-                        List<Integer> cords = new ArrayList<>(x);
+                        List<Integer> cords = new ArrayList<>();
+                        cords.add(x);
                         cords.add(y);
                         A.add(cords);
                     } else if (n_livre==0) {
@@ -107,7 +109,8 @@ public class App {
                             if(!b) break;
                         }
                         if(b) {
-                            List<Integer> cords = new ArrayList<>(x);
+                            List<Integer> cords = new ArrayList<>();
+                            cords.add(x);
                             cords.add(y);
                             B.add(cords);
                         }
@@ -118,6 +121,78 @@ public class App {
             this.readlock.unlock();
         }
 
+    }
+
+    public String recompensas_na_areas(int X,int Y){
+        List<List<Integer>> A = new ArrayList<>();
+        List<List<Integer>> B = new ArrayList<>();
+        try {
+            this.readlock.lock();
+            for(int l=Y-this.distancia;l<Y+this.distancia && l<this.tamanho;l++) {
+                if (l >= 0) {
+                    for (int c = X - this.distancia; c < X + this.distancia && c < this.tamanho; c++) {
+                        if (c >= 0 && this.distancia >= abs(l - Y) + abs(c - X)) {
+                            trotinetes = this.mapa.get(l).get(c);
+                            int n_livre=0;
+                            for(Trotinete t:trotinetes){
+                                if(t.isLivre())n_livre++;
+                            }
+                            if (n_livre>1){
+                                List<Integer> cords = new ArrayList<>();
+                                cords.add(c);
+                                cords.add(l);
+                                A.add(cords);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for(int y=0;y<this.tamanho;y++){
+                for(int x=0;x<this.tamanho;x++){
+                    trotinetes = this.mapa.get(y).get(x);
+                    int n_livre=0;
+                    for(Trotinete t:trotinetes){
+                        if(t.isLivre())n_livre++;
+                    }
+                    if (n_livre==0) {
+                        boolean b = true;
+                        for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
+                            if (l>=0){
+                                for(int c=x-this.distancia;c<x+this.distancia && c<this.tamanho;c++){
+                                    if(c>=0 && this.distancia>=abs(l-y)+abs(c-x) ){
+                                        List<Trotinete> trotinetesss = this.mapa.get(l).get(c);
+                                        for (Trotinete trotinete: trotinetesss) {
+                                            if (trotinete.isLivre()) {
+                                                b = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!b) break;
+                                }
+                            }
+                            if(!b) break;
+                        }
+                        if(b) {
+                            List<Integer> cords = new ArrayList<>();
+                            cords.add(x);
+                            cords.add(y);
+                            B.add(cords);
+                        }
+                    }
+                }
+            }
+        }finally {
+            this.readlock.unlock();
+        }
+        String recompensas = "";
+        for (List<Integer> origem :A){
+            for (List<Integer> destino :B){
+                recompensas = recompensas + "Origem:" + "("+origem.get(0)+","+origem.get(1)+")" +" Destino:"+ "("+destino.get(0)+","+destino.get(1)+")"+"\n";
+            }
+        }
+        return recompensas;
     }
 
     public String reserva_trotinete(int x ,int y){
@@ -155,8 +230,8 @@ public class App {
         if (codigo!=-1){
             Date dataHoraAtual = new Date();
             String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
-            String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
-            reserva = reserva +" "+ data+hora;
+            String hora = new SimpleDateFormat("HH/mm/ss").format(dataHoraAtual);
+            reserva = reserva +" "+ hora+" " +data;
         }
         return reserva;
     }
