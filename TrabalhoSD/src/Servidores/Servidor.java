@@ -143,10 +143,10 @@ public class Servidor {
                         this.atualiza = true;
                         this.re_es--;
                         cors_ant = this.aplication.liverta_trotinete(x,y,Integer.parseInt(reserva_tokens[0]));
-                        System.out.println(cors_ant);
+
                         if (cors_ant != null) {
                             for(List<Integer>as:A){
-                                if(as.get(0)==cors_ant.get(0) && as.get(1)==as.get(1)){
+                                if(as.get(0) == cors_ant.get(0) && as.get(1)==as.get(1)){
                                     for(List<Integer>bs:B){
                                         if (bs.get(0) == x && bs.get(1) == y) {
                                             recompensa = true;
@@ -165,7 +165,7 @@ public class Servidor {
                     }
                     if (cors_ant!=null){
                         int distancia = abs(cors_ant.get(0)-x) + abs(cors_ant.get(1)-y);
-                        long tempo = getDifferenceInMinutes(tokens[3]+tokens[4]);
+                        long tempo = getDifferenceInMinutes(tokens[3]+" "+tokens[4]);
                         double preco= tempo * 0.1 + distancia * 0.1;
                         if (recompensa) preco = preco*0.8;
                         c.send(6,"0".getBytes());
@@ -201,6 +201,7 @@ public class Servidor {
         while (true){
             try {
                 this.lock.lock();
+                this.notifica.await();
                 StringBuilder notificaçao = new StringBuilder();
                 for(List<Integer> cords_atual:this.A){
                     if(abs(cords_atual.get(0) -x)+abs(cords_atual.get(1)-y)<=this.aplication.distancia){
@@ -209,10 +210,8 @@ public class Servidor {
                         }
                     }
                 }
-                c.send(9,notificaçao.toString().getBytes());
-                while (this.re_es>0 || !this.atualiza){
-                    this.notifica.await();
-                }
+                if(!notificaçao.toString().equals("")){
+                    c.send(9,notificaçao.toString().getBytes());}
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             } finally {
@@ -243,7 +242,7 @@ public class Servidor {
     }
 
     public long getDifferenceInMinutes(String date) {
-        SimpleDateFormat format = new SimpleDateFormat("ss/mm/HH dd/MM/yyyy");
+        SimpleDateFormat format = new SimpleDateFormat("HH/mm/ss dd/MM/yyyy");
         Date d = null;
         try {
             d = format.parse(date);

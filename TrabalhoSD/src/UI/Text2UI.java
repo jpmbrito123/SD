@@ -15,7 +15,7 @@ public class Text2UI {
     // Scanner para leitura
     private Scanner scin;
 
-    private String senha;
+    private String senha = null;
 
     private Demultiplexer multi;
 
@@ -80,7 +80,7 @@ public class Text2UI {
             multi.send(8,"Desativar Notificacao".getBytes());
             byte[] reply = multi.receive(8);
             int error = Integer.parseInt(new String(reply));
-            if(error==0){
+            if(error==0 && this.thread !=null){
                 this.thread.interrupt();
                 System.out.println("Notificaçoes desativadas");
             }
@@ -136,9 +136,10 @@ public class Text2UI {
                 byte[] reply = multi.receive(6);
                 int error = Integer.parseInt(new String(reply));
                 System.out.println("\n\n");
-                if(error==0){
+                if(error==0 && this.senha!=null){
                     byte[] reply1 = multi.receive(6);
                     String preco = new String(reply1);
+                    this.senha=null;
                     System.out.println("O valor da viagem é: " + preco + "$");
                 }
                 else
@@ -192,7 +193,7 @@ public class Text2UI {
                 byte[] reply = multi.receive(5);
                 int error = Integer.parseInt(new String(reply));
                 System.out.println("\n\n");
-                if (error==0){
+                if (error==0 && this.senha==null){
                     byte[] reply1 = multi.receive(5);
                     String[] s = new String(reply1).split(" ");
                     this.senha = new String(reply1);

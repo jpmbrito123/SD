@@ -256,6 +256,7 @@ public class App {
                     t.setCorX(x);t.setCorY(y);
                     this.mapa.get(y).get(x).add(t);
                     b = true;
+                    System.out.println(b);
                     break;
                 }
             }
