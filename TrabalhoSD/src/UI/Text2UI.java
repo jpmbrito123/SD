@@ -64,13 +64,14 @@ public class Text2UI {
                 String coordenadas = scin.nextLine();
                 multi.send(3,coordenadas.getBytes());
                 byte[] reply = multi.receive(3);
+                System.out.println(1111);
                 int error = Integer.parseInt(new String(reply));
+                System.out.println(2222);
                 byte[] reply1 = multi.receive(3);
                 System.out.println("\n");
                 if (error==0){
                     String aux = new String(reply1);
                     System.out.println(aux);
-                    System.out.println("oi");
                 }
                 else
                     System.out.println("\033[0;31m" + new String(reply1) + ": Falha ao apresentar coordenadas" + "\n\n\033[0m");
@@ -85,7 +86,7 @@ public class Text2UI {
         t.join();
     }
     
-    public void trataReservarTrotinete(){
+    public void trataReservarTrotinete() throws InterruptedException {
         Thread t = new Thread(() -> {
             try {
                 System.out.println("Indique que trotinete pretende reservar");
@@ -105,10 +106,8 @@ public class Text2UI {
                 System.out.println(e.getMessage() + "\n\n");
             }
         });
-
-
-
-
+        t.start();
+        t.join();
     }
 
     /**

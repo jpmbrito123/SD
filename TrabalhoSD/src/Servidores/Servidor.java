@@ -49,25 +49,26 @@ public class Servidor {
                 if(frame.tag == 1){
                 }else if(frame.tag == 2) {
                 }else if(frame.tag == 3){
-                    System.out.println(122);
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
                     List<List<Integer>> list =aplication.trotinetes_livres(x,y);
                     if(list.size()>0){
-                        c.send(3,Integer.toString(0).getBytes());
+                        System.out.println(y);
+                        c.send(3,"0".getBytes());
                         String resposta = this.aplication.trotinetesToString(aplication.trotinetes_livres(x,y));
                         c.send(3,resposta.getBytes());
-                    }else c.send(3,Integer.toString(-1).getBytes());
+                        System.out.println(x);
+                    }else c.send(3,"-1".getBytes());
                 }else if(frame.tag == 4){
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
                     String recompensas = aplication.recompensas_na_areas(x,y);
                     if (recompensas.compareTo("")!=0){
-                        c.send(4,Integer.toString(0).getBytes());
+                        c.send(4,"0".getBytes());
                         c.send(4,recompensas.getBytes());
-                    }else c.send(4,Integer.toString(-1).getBytes());
+                    }else c.send(4,"-1".getBytes());
                 } else if (frame.tag == 5) {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
@@ -87,9 +88,9 @@ public class Servidor {
                         this.writel.unlock();
                     }
                     if(reserva.compareTo("-1")==0){
-                        c.send(5,Integer.toString(-1).getBytes());
+                        c.send(5,"-1".getBytes());
                     }else {
-                        c.send(5,Integer.toString(0).getBytes());
+                        c.send(5,"0".getBytes());
                         c.send(5,reserva.getBytes());
                     }
                 } else if (frame.tag == 6) {
@@ -113,23 +114,23 @@ public class Servidor {
                         this.writel.unlock();
                     }
                     if (b){//falta pagamento
-                        c.send(6,Integer.toString(0).getBytes());
-                    }else c.send(6,Integer.toString(-1).getBytes());
+                        c.send(6,"0".getBytes());
+                    }else c.send(6,"-1".getBytes());
                 } else if (frame.tag == 7) {
                     if (espera_notificacao == null){
                         espera_notificacao = new Thread(()->{espera_notificacoes(c);});
                         espera_notificacao.start();
-                        c.send(7,Integer.toString(0).getBytes());
+                        c.send(7,"0".getBytes());
                     }else {
-                        c.send(7,Integer.toString(-1).getBytes());
+                        c.send(7,"-1".getBytes());
                     }
                 } else if (frame.tag == 8) {
                     if (espera_notificacao != null) {
                         espera_notificacao.interrupt();
                         espera_notificacao = null;
-                        c.send(8,Integer.toString(0).getBytes());
+                        c.send(8,"0".getBytes());
                     }else {
-                        c.send(8,Integer.toString(-1).getBytes());
+                        c.send(8,"-1".getBytes());
                     }
                 }
             }
