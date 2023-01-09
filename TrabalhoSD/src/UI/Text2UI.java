@@ -43,6 +43,31 @@ public class Text2UI {
         this.modelUtilizador = new ClienteFacade();
         scin = new Scanner(System.in);
     }
+    
+    public void trataTrotinetesLivres(){
+        Thread t = new Thread(() -> {
+            try{
+                System.out.println("Insira as suas coordenadas:");
+                String coordenadas = scin.nextLine();
+                multi.send(3,coordenadas.getBytes());
+                byte[] reply = multi.receive(3);
+                int error = Integer.parseInt(new String(reply));
+                byte[] reply1 = multi.receive(3);
+                System.out.println("\n");
+                if (error==0){
+                    String aux = new String(reply1);
+                    System.out.println(aux);
+                }
+                else
+                    System.out.println("\033[0;31m" + new String(reply1) + ": Falha ao apresentar coordenadas" + "\n\n\033[0m");
+            }
+            catch (NullPointerException | IOException | InterruptedException e) {
+                System.out.print(e.getMessage() + "\n\n");
+            } {
+
+            }
+        });
+    }
 
     /**
      * Executa o menu principal e invoca o método correspondente à opção seleccionada.
