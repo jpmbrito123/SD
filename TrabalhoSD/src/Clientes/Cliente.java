@@ -30,10 +30,4 @@ public class Cliente {
     public void setPassword(String password) {
         this.password = password;
     }
-
-
-
-    public static void main(String[] args) throws IOException {
-        Socket socket = new Socket("localhost", 12345);
-    }
 }
