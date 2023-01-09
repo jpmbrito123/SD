@@ -1,96 +1,96 @@
 package Clientes;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Demultiplexer implements AutoCloseable {
-    private TaggedConnection con;
-    private ReentrantLock lock = new ReentrantLock();
-    private Map<Integer,Entry> buffer = new HashMap<>();
+public class Demultiplexer {
+
+    private TaggedConnection tc;
+    private ReentrantLock l = new ReentrantLock();
+    private Map<Integer, FrameValue> map = new HashMap<>();
     private IOException exception = null;
 
-    private class Entry {
+    private class FrameValue {
         int waiters = 0;
-        ArrayDeque<byte[]> queue = new ArrayDeque<>();
-        Condition cond = lock.newCondition();
-    }
+        Queue<byte[]> queue = new ArrayDeque<>();
+        Condition c = l.newCondition();
 
-    private Entry get(int tag){
-        Entry entry = buffer.get(tag);
-        if(entry == null) {
-            entry = new Entry();
-            buffer.put(tag,entry);
+        public FrameValue() {
+
         }
-        return entry;
     }
 
-    public Demultiplexer(TaggedConnection connection) throws IOException{
-        this.con = connection;
+    public Demultiplexer(TaggedConnection conn) throws IOException {
+        this.tc = conn;
     }
 
-    public void start() throws IOException{
+    public void start() {
         new Thread(() -> {
             try {
-                while(true){
-                    TaggedConnection.Frame frame = con.receive();
-                    lock.lock();
-                    try{
-                        Entry entry = buffer.get(frame.tag);
-                        if(entry == null){
-                            entry = new Entry();
-                            buffer.put(frame.tag,entry);
+                while (true) {
+                    TaggedConnection.Frame frame = tc.receive();
+                    l.lock();
+                    try {
+                        FrameValue fv = map.get(frame.tag);
+                        if (fv == null) {
+                            fv = new FrameValue();
+                            map.put(frame.tag, fv);
                         }
-                        entry.queue.add(frame.data);
-                        entry.cond.signal();
+                        fv.queue.add(frame.data);
+                        fv.c.signal();
                     }
-                    finally { lock.unlock(); }
+                    finally {
+                        l.unlock();
+                    }
                 }
             }
-            catch(IOException e){
+            catch (IOException e) {
                 exception = e;
             }
         }).start();
     }
 
     public void send(TaggedConnection.Frame frame) throws IOException {
-        con.send(frame);
+        tc.send(frame);
     }
 
     public void send(int tag, byte[] data) throws IOException {
-        con.send(tag,data);
+        tc.send(tag, data);
     }
 
-    public byte[] receive(int tag) throws IOException, InterruptedException{
-        lock.lock();
-        Entry entry;
-        try{
-            entry = buffer.get(tag);
-            if(entry == null){
-                entry = new Entry();
-                buffer.put(tag, entry);
+    public byte[] receive(int tag) throws IOException, InterruptedException {
+        l.lock();
+        FrameValue fv;
+        try {
+            fv = map.get(tag);
+            if (fv == null) {
+                fv = new FrameValue();
+                map.put(tag, fv);
             }
-            entry.waiters++;
-            while(true){
-                if(!entry.queue.isEmpty()){
-                    entry.waiters--;
-                    byte[] reply = entry.queue.poll();
-                    if(entry.waiters == 0 && entry.queue.isEmpty())
-                        buffer.remove(tag);
+            fv.waiters++;
+            while(true) {
+                if(! fv.queue.isEmpty()) {
+                    fv.waiters--;
+                    byte[] reply = fv.queue.poll();
+                    if (fv.waiters == 0 && fv.queue.isEmpty())
+                        map.remove(tag);
                     return reply;
                 }
-                if(exception != null) { throw exception; }
-                entry.cond.await();
+                if (exception != null) {
+                    throw exception;
+                }
+                fv.c.await();
             }
         }
-        finally{ lock.unlock(); }
+        finally {
+            l.unlock();
+        }
     }
+
+
     public void close() throws IOException {
-        con.close();
+        tc.close();
     }
 }
