@@ -10,7 +10,8 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Text2UI {
-
+    
+    private String senha;
     // Menus da aplicação
     private Menu menu;
 
@@ -117,6 +118,7 @@ public class Text2UI {
                 if (error==0){
                     byte[] reply1 = multi.receive(5);
                     String[] s = new String(reply1).split(" ");
+                    this.senha = new String(reply1);
                     System.out.println("Reservou a trotinete: " + s[0] + " \n No instante: " + s[1] + "|" + s[2]);
                 }
                 else System.out.println("\033[0;31m" +": Falha ao reservar trotinete" + "\n\n\033[0m");
@@ -128,7 +130,6 @@ public class Text2UI {
         t.start();
         t.join();
     }
-
     /**
      * Executa o menu principal e invoca o método correspondente à opção seleccionada.
      */
