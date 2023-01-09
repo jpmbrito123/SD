@@ -27,7 +27,8 @@ public class TextUI {
      * <p>
      * Cria os menus e a camada de negócio.
      */
-    public TextUI(Demultiplexer multi) {
+    public TextUI(Demultiplexer multi,Cliente cliente) {
+        this.c = cliente;
         this.multi=multi;
         // Criar o menu
         this.menu = new Menu(new String[]{

@@ -163,12 +163,12 @@ public class App {
             this.writlock.unlock();
         }
     }
-    public StringBuilder trotinetesToString(List<List<Integer>> l){
+    public String trotinetesToString(List<List<Integer>> l){
         StringBuilder s = new StringBuilder();
         for(int i=0;i<l.size();i++){
-                String aux= "Trotinete: " + Integer.toString(i) + "X: " + l.get(i).get(0) + "Y: " + l.get(i).get(1);
+                String aux= "Trotinete em X: " + l.get(i).get(0) + "Y: " + l.get(i).get(1);
             s.append(aux).append(" | ");
         }
-        return s;
+        return s.toString();
     }
 }

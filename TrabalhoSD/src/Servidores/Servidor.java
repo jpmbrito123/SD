@@ -52,25 +52,32 @@ public class Servidor {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
-                    this.aplication.trotinetesToString(aplication.trotinetes_livres(x,y));
+                    List<List<Integer>> list =aplication.trotinetes_livres(x,y);
+                    if(list.size()>0){
+                        c.send(3,Integer.toString(0).getBytes());
+                        String resposta = this.aplication.trotinetesToString(aplication.trotinetes_livres(x,y));
+                        c.send(3,resposta.getBytes());
+                    }else c.send(3,Integer.toString(-1).getBytes());
                 }else if(frame.tag == 4){
                 } else if (frame.tag == 5) {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
+                    int codigo = -1;
                     try {
                         this.writel.lock();
                         while (atualiza){
                             this.atualizou.await();
                         }
                         this.atualiza = true;
-                        this.aplication.reserva_trotinete(x,y);
+                        codigo = this.aplication.reserva_trotinete(x,y);
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
                         this.writel.unlock();
                     }
+                    c.send(5,Integer.toString(codigo).getBytes());
                 } else if (frame.tag == 6) {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
