@@ -7,10 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.locks.*;
 
 import static java.lang.Integer.parseInt;
@@ -18,6 +15,8 @@ import static java.lang.Math.abs;
 
 public class Servidor {
     public App aplication = new App();
+
+    public HashMap<String,String> utilizadores = new HashMap<>();
 
     List<List<Integer>> A= new ArrayList<>();
     List<List<Integer>> B = new ArrayList<>();
@@ -29,9 +28,9 @@ public class Servidor {
 
     public Condition notifica = lock.newCondition();
 
-    public boolean atualiza;
+    public boolean atualiza = false;
 
-    public int re_es =0;
+    public int re_es = 0;
 
 
     public Servidor() {
@@ -54,7 +53,34 @@ public class Servidor {
                 TaggedConnection.Frame frame = c.receive();
                 String data = new String(frame.data);
                 if(frame.tag == 1){
+                    boolean b = false;
+                    String[] tokens = data.split(" ");
+                    try {
+                        this.lock.lock();
+                        if (this.utilizadores.containsKey(tokens[0])){
+                            if(this.utilizadores.get(tokens[0]).equals(tokens[1])){
+                                b =true;
+                            }
+                        }
+                    }finally {
+                        this.lock.unlock();
+                    }
+                    if (b) c.send(0,"0".getBytes());
+                    else c.send(0,"-1".getBytes());
                 }else if(frame.tag == 2) {
+                    boolean b = false;
+                    String[] tokens = data.split(" ");
+                    try {
+                        this.lock.lock();
+                        if (!this.utilizadores.containsKey(tokens[0])){
+                            b=true;
+                            this.utilizadores.put(tokens[0],tokens[1]);
+                        }
+                    }finally {
+                        this.lock.unlock();
+                    }
+                    if (b) c.send(0,"0".getBytes());
+                    else c.send(0,"-1".getBytes());
                 }else if(frame.tag == 3){
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
@@ -117,15 +143,18 @@ public class Servidor {
                         this.atualiza = true;
                         this.re_es--;
                         cors_ant = this.aplication.liverta_trotinete(x,y,Integer.parseInt(reserva_tokens[0]));
+                        System.out.println(cors_ant);
                         if (cors_ant != null) {
                             for(List<Integer>as:A){
                                 if(as.get(0)==cors_ant.get(0) && as.get(1)==as.get(1)){
                                     for(List<Integer>bs:B){
-                                        if(bs.get(0)==x && bs.get(1)==y){
+                                        if (bs.get(0) == x && bs.get(1) == y) {
                                             recompensa = true;
+                                            break;
                                         }
                                     }
                                 }
+                                if(recompensa) break;
                             }
                         }
                         this.pode_atualizar.signalAll();
@@ -180,8 +209,8 @@ public class Servidor {
                         }
                     }
                 }
-                c.send(7,notificaçao.toString().getBytes());
-                while (this.re_es>0){
+                c.send(9,notificaçao.toString().getBytes());
+                while (this.re_es>0 || !this.atualiza){
                     this.notifica.await();
                 }
             } catch (InterruptedException | IOException e) {

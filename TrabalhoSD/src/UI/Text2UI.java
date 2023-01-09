@@ -19,23 +19,7 @@ public class Text2UI {
 
     private Demultiplexer multi;
 
-    private final Thread thread = new Thread(()->{try {
-        System.out.println("Indique as suas coordenadas");
-        int x = this.scin.nextInt();
-        int y = this.scin.nextInt();
-        multi.send(7,(x+" "+y).getBytes());
-        byte[] reply = multi.receive(7);
-        int error = Integer.parseInt(new String(reply));
-        if(error==0){
-            System.out.println("Notificaçoes ativadas");
-        }
-        else this.thread.interrupt();
-
-    }
-    catch (NullPointerException | IOException | InterruptedException e){
-        System.out.print(e.getMessage() + "\n\n");
-
-    }});
+    private Thread thread = null;
 
     /**
      * Construtor.
@@ -112,10 +96,31 @@ public class Text2UI {
 
     private void trataPedirNotificacoes() throws InterruptedException {
         try {
-            this.thread.start();
-            this.thread.join();
+            System.out.println("Indique as suas coordenadas");
+            int x = this.scin.nextInt();
+            int y = this.scin.nextInt();
+            multi.send(7,(x+" "+y).getBytes());
+            byte[] reply = multi.receive(7);
+            int error = Integer.parseInt(new String(reply));
+            if(error==0 && this.thread == null){
+                this.thread = new Thread(()->{
+                    while (true){
+                        try {
+                            byte[] reply1 = multi.receive(9);
+                            String notificacao = new String(reply1);
+                            System.out.println("Nova Notificaçoes");
+                            System.out.println(notificacao);
+
+                        }catch (NullPointerException | IOException | InterruptedException e){
+                            System.out.print(e.getMessage() + "\n\n");
+                        }
+                    }});
+                this.thread.start();
+                System.out.println("Notificaçoes ativadas");
+            }
+            else System.out.println("Notificaçoes nao ativadas");
         }
-        catch (NullPointerException | InterruptedException e){
+        catch (NullPointerException | IOException e){
             System.out.print(e.getMessage() + "\n\n");
 
         }
