@@ -19,7 +19,20 @@ public class Text2UI {
     
     private Demultiplexer multi;
 
-    private Thread thread = new Thread(this::trataPedirNotificacoes);
+    private final Thread thread = new Thread(()->{try {
+        multi.send(7,"Ativar Notificacao".getBytes());
+        byte[] reply = multi.receive(7);
+        int error = Integer.parseInt(new String(reply));
+        if(error==0){
+            System.out.println("Notificaçoes ativadas");
+        }
+        else this.thread.join();
+
+    }
+    catch (NullPointerException | IOException | InterruptedException e){
+        System.out.print(e.getMessage() + "\n\n");
+
+    }});
 
     /**
      * Construtor.
@@ -72,20 +85,6 @@ public class Text2UI {
 
     private void trataPedirNotificacoes() {
         this.thread.start();
-        try {
-            multi.send(7,"Ativar Notificacao".getBytes());
-            byte[] reply = multi.receive(7);
-            int error = Integer.parseInt(new String(reply));
-            if(error==0){
-                System.out.println("Notificaçoes ativadas");
-            }
-            else this.thread.join();
-
-        }
-        catch (NullPointerException | IOException | InterruptedException e){
-            System.out.print(e.getMessage() + "\n\n");
-
-        }
     }
 
     private void trataEstacionar() throws InterruptedException {
