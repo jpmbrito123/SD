@@ -52,7 +52,7 @@ public class Servidor {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
-                    this.aplication.trotinetes_livres(x,y);
+                    this.aplication.trotinetesToString(aplication.trotinetes_livres(x,y));
                 }else if(frame.tag == 4){
                 } else if (frame.tag == 5) {
                     String[] tokens = data.split(" ");
