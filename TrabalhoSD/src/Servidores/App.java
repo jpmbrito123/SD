@@ -49,9 +49,9 @@ public class App {
         List<List<Integer>> livres= new ArrayList<>();
         try {
             this.readlock.lock();
-            for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
+            for(int l=y-this.distancia;l<=y+this.distancia && l<this.tamanho;l++){
                 if (l>=0){
-                    for(int c=x-this.distancia;c<x+this.distancia && c<this.tamanho;c++){
+                    for(int c=x-this.distancia;c<=x+this.distancia && c<this.tamanho;c++){
                         if(c>=0 && this.distancia>=abs(l-y)+abs(c-x) ){
                             List<Trotinete> trotinetes = this.mapa.get(l).get(c);
                             for (Trotinete trotinete: trotinetes) {
@@ -91,9 +91,9 @@ public class App {
                         A.add(cords);
                     } else if (n_livre==0) {
                         boolean b = true;
-                        for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
+                        for(int l=y-this.distancia;l<=y+this.distancia && l<this.tamanho;l++){
                             if (l>=0){
-                                for(int c=x-this.distancia;c<x+this.distancia && c<this.tamanho;c++){
+                                for(int c=x-this.distancia;c<=x+this.distancia && c<this.tamanho;c++){
                                     if(c>=0 && this.distancia>=abs(l-y)+abs(c-x) ){
                                         List<Trotinete> trotinetesss = this.mapa.get(l).get(c);
                                         for (Trotinete trotinete: trotinetesss) {
@@ -128,9 +128,9 @@ public class App {
         List<List<Integer>> B = new ArrayList<>();
         try {
             this.readlock.lock();
-            for(int l=Y-this.distancia;l<Y+this.distancia && l<this.tamanho;l++) {
+            for(int l=Y-this.distancia;l<=Y+this.distancia && l<this.tamanho;l++) {
                 if (l >= 0) {
-                    for (int c = X - this.distancia; c < X + this.distancia && c < this.tamanho; c++) {
+                    for (int c = X - this.distancia; c <= X + this.distancia && c < this.tamanho; c++) {
                         if (c >= 0 && this.distancia >= abs(l - Y) + abs(c - X)) {
                             trotinetes = this.mapa.get(l).get(c);
                             int n_livre=0;
@@ -157,9 +157,9 @@ public class App {
                     }
                     if (n_livre==0) {
                         boolean b = true;
-                        for(int l=y-this.distancia;l<y+this.distancia && l<this.tamanho;l++){
+                        for(int l=y-this.distancia;l<=y+this.distancia && l<this.tamanho;l++){
                             if (l>=0){
-                                for(int c=x-this.distancia;c<x+this.distancia && c<this.tamanho;c++){
+                                for(int c=x-this.distancia;c<=x+this.distancia && c<this.tamanho;c++){
                                     if(c>=0 && this.distancia>=abs(l-y)+abs(c-x) ){
                                         List<Trotinete> trotinetesss = this.mapa.get(l).get(c);
                                         for (Trotinete trotinete: trotinetesss) {
@@ -202,10 +202,10 @@ public class App {
         try {
             this.writlock.lock();
             if (x >= 0 && x < this.tamanho && y >= 0 && y < this.tamanho) {
-                for (int n = 0; n < this.distancia; n++) {
-                    for (int l = y - n; l < y + n && l < n; l++) {
+                for (int n = 0; n <= this.distancia; n++) {
+                    for (int l = y - n; l <= y + n && l < this.tamanho; l++) {
                         if (l >= 0) {
-                            for (int c = x - n; c < x + n && c < n; c++) {
+                            for (int c = x - n; c <= x + n && c < this.tamanho; c++) {
                                 if (c >= 0 && n >= abs(l - y) + abs(c - x)) {
                                     List<Trotinete> trotinetes = this.mapa.get(l).get(c);
                                     for (Trotinete trotinete : trotinetes) {
@@ -262,8 +262,8 @@ public class App {
     }
     public String trotinetesToString(List<List<Integer>> l){
         StringBuilder s = new StringBuilder();
-        for(int i=0;i<l.size();i++){
-                String aux= "Trotinete em X: " + l.get(i).get(0) + "Y: " + l.get(i).get(1);
+        for(List<Integer>subl :l){
+                String aux= "Trotinete em X: " + subl.get(0) + "Y: " + subl.get(1);
             s.append(aux).append(" | ");
         }
         return s.toString();

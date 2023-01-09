@@ -105,7 +105,7 @@ public class Text2UI {
                     String[] s = new String(reply1).split(" ");
                     System.out.println("Reservou a trotinete: " + s[0] + " \n No instante: " + s[1] + "|" + s[2]);
                 }
-                else System.out.println("\033[0;31m" + new String(reply1) + ": Falha ao reservar trotinete" + "\n\n\033[0m");
+                else System.out.println("\033[0;31m" +": Falha ao reservar trotinete" + "\n\n\033[0m");
             }
             catch(NullPointerException | IOException | InterruptedException e){
                 System.out.println(e.getMessage() + "\n\n");
