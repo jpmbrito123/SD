@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.locks.*;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.Math.abs;
 
 public class Servidor {
     public App aplication = new App();
@@ -18,14 +19,16 @@ public class Servidor {
     List<List<Integer>> A= new ArrayList<>();
     List<List<Integer>> B = new ArrayList<>();
 
-    public ReentrantReadWriteLock lockc = new ReentrantReadWriteLock();
+    public ReentrantLock lock = new ReentrantLock();
+    public Condition pode_atualizar = lock.newCondition();
 
-    public Lock readl = lockc.readLock();
-    public Lock writel = lockc.writeLock();
-    public Condition pode_atualizar = writel.newCondition();
+    public Condition atualizou = lock.newCondition();
 
-    public Condition atualizou = writel.newCondition();
+    public Condition notifica = lock.newCondition();
+
     public boolean atualiza;
+
+    public int re_es =0;
 
 
     public Servidor() {
@@ -37,6 +40,7 @@ public class Servidor {
             Trotinete t = new Trotinete(i,x,y,true);
             aplication.adiciona_trotinete(t);
         }
+
     }
 
     public void clientes (Socket s) throws IOException {
@@ -73,17 +77,19 @@ public class Servidor {
                     int y = parseInt(tokens[1]);
                     String reserva = "";
                     try {
-                        this.writel.lock();
+                        this.lock.lock();
+                        this.re_es++;
                         while (atualiza){
                             this.atualizou.await();
                         }
                         this.atualiza = true;
+                        this.re_es--;
                         reserva = this.aplication.reserva_trotinete(x,y);
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
-                        this.writel.unlock();
+                        this.lock.unlock();
                     }
                     if(reserva.compareTo("-1")==0){
                         c.send(5,"-1".getBytes());
@@ -99,24 +105,29 @@ public class Servidor {
                     String[] reserva_tokens = reserva.split(" ");
                     boolean b =false;
                     try {
-                        this.writel.lock();
+                        this.lock.lock();
+                        this.re_es++;
                         while (atualiza){
                             this.atualizou.await();
                         }
                         this.atualiza = true;
+                        this.re_es--;
                         b = this.aplication.liverta_trotinete(x,y,Integer.parseInt(reserva_tokens[0]));
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
-                        this.writel.unlock();
+                        this.lock.unlock();
                     }
                     if (b){//falta pagamento
                         c.send(6,"0".getBytes());
                     }else c.send(6,"-1".getBytes());
                 } else if (frame.tag == 7) {
                     if (espera_notificacao == null){
-                        espera_notificacao = new Thread(()->{espera_notificacoes(c);});
+                        String[] tokens = data.split(" ");
+                        int x =  parseInt(tokens[0]);
+                        int y = parseInt(tokens[1]);
+                        espera_notificacao = new Thread(()->{espera_notificacoes(c,x,y);});
                         espera_notificacao.start();
                         c.send(7,"0".getBytes());
                     }else {
@@ -137,17 +148,26 @@ public class Servidor {
         }
     }
 
-    private void espera_notificacoes(TaggedConnection c) {
+    private void espera_notificacoes(TaggedConnection c,int x,int y) {
         while (true){
             try {
-                this.readl.lock();
-                while (atualiza){
-                    this.atualizou.await();
+                this.lock.lock();
+                StringBuilder notificaçao = new StringBuilder();
+                for(List<Integer> cords_atual:this.A){
+                    if(abs(cords_atual.get(0) -x)+abs(cords_atual.get(1)-y)<=this.aplication.distancia){
+                        for (List<Integer> cords_prox:this.B){
+                            notificaçao.append("Origem:").append("(").append(cords_atual.get(0)).append(",").append(cords_atual.get(1)).append(")").append(" Destino:").append("(").append(cords_prox.get(0)).append(",").append(cords_prox.get(1)).append(")").append("\n");
+                        }
+                    }
                 }
-            } catch (InterruptedException e) {
+                c.send(7,notificaçao.toString().getBytes());
+                while (this.re_es>0){
+                    this.notifica.await();
+                }
+            } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
-            }finally {
-                this.readl.unlock();
+            } finally {
+                this.lock.unlock();
             }
         }
     }
@@ -155,19 +175,20 @@ public class Servidor {
     private void recompensas(){
         while (true){
             try {
-                writel.lock();
-                while (!this.atualiza){
-                    this.pode_atualizar.await();
-                }
+                lock.lock();
                 this.atualiza=false;
                 this.A.clear();
                 this.B.clear();
                 this.aplication.recompensas(A,B);
-                this.atualizou.signalAll();
+                if(this.re_es>0) this.atualizou.signalAll();
+                else this.notifica.signalAll();
+                while (!this.atualiza){
+                    this.pode_atualizar.await();
+                }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } finally {
-                writel.lock();
+                lock.lock();
             }
         }
     }

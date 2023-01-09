@@ -55,14 +55,7 @@ public class Text2UI {
     }
 
     private void trataEstacionar() {
-        Thread t = new Thread(() -> {
-            try{
 
-            }
-            catch{
-            }
-
-        })
     }
 
     public void trataTrotinetesLivres() throws InterruptedException {
