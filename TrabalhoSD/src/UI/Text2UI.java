@@ -91,13 +91,13 @@ public class Text2UI {
                 multi.send(5,coordenadas.getBytes());
                 byte[] reply = multi.receive(5);
                 int error = Integer.parseInt(new String(reply));
-                byte[] reply1 = multi.receive(5);
                 System.out.println("\n\n");
                 if (error==0){
+                    byte[] reply1 = multi.receive(5);
                     String[] s = new String(reply1).split(" ");
                     System.out.println("Reservou a trotinete: " + s[0] + "\nNo instante: " + s[1]);
                 }
-                else System.out.println("\033[0;31m" + new String(reply1) + ": Falha ao reservar trotinete" + "\n\n\033[0m");
+                else System.out.println("\033[0;31m" +": Falha ao reservar trotinete" + "\n\n\033[0m");
             }
             catch(NullPointerException | IOException | InterruptedException e){
                 System.out.println(e.getMessage() + "\n\n");
