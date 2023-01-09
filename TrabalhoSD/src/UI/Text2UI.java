@@ -57,7 +57,7 @@ public class Text2UI {
     private void trataEstacionar() {
     }
 
-    public void trataTrotinetesLivres(){
+    public void trataTrotinetesLivres() throws InterruptedException {
         Thread t = new Thread(() -> {
             try{
                 System.out.println("Insira as suas coordenadas:");
@@ -70,6 +70,7 @@ public class Text2UI {
                 if (error==0){
                     String aux = new String(reply1);
                     System.out.println(aux);
+                    System.out.println("oi");
                 }
                 else
                     System.out.println("\033[0;31m" + new String(reply1) + ": Falha ao apresentar coordenadas" + "\n\n\033[0m");
@@ -80,6 +81,8 @@ public class Text2UI {
 
             }
         });
+        t.start();
+        t.join();
     }
     
     public void trataReservarTrotinete(){

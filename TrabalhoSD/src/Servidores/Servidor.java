@@ -49,6 +49,7 @@ public class Servidor {
                 if(frame.tag == 1){
                 }else if(frame.tag == 2) {
                 }else if(frame.tag == 3){
+                    System.out.println(122);
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);

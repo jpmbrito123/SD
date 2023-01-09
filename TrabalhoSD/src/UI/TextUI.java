@@ -92,7 +92,7 @@ public class TextUI {
                 byte[] reply1 = multi.receive(1);
                 System.out.println("\n");
                 if(error==0){
-                    String[] tokens = new String(reply1).split("-");
+                    String[] tokens = new String(reply1).split(" ");
                     System.out.print(tokens[0] + "\n\n\n");
                     c.setNome(nomeUtilizador);
                     new Text2UI(multi).run();
