@@ -54,11 +54,9 @@ public class Servidor {
                     int y = parseInt(tokens[1]);
                     List<List<Integer>> list =aplication.trotinetes_livres(x,y);
                     if(list.size()>0){
-                        System.out.println(y);
                         c.send(3,"0".getBytes());
                         String resposta = this.aplication.trotinetesToString(aplication.trotinetes_livres(x,y));
                         c.send(3,resposta.getBytes());
-                        System.out.println(x);
                     }else c.send(3,"-1".getBytes());
                 }else if(frame.tag == 4){
                     String[] tokens = data.split(" ");

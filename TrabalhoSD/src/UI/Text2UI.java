@@ -64,17 +64,14 @@ public class Text2UI {
                 String coordenadas = scin.nextLine();
                 multi.send(3,coordenadas.getBytes());
                 byte[] reply = multi.receive(3);
-                System.out.println(1111);
                 int error = Integer.parseInt(new String(reply));
-                System.out.println(2222);
-                byte[] reply1 = multi.receive(3);
-                System.out.println("\n");
                 if (error==0){
+                    byte[] reply1 = multi.receive(3);
                     String aux = new String(reply1);
                     System.out.println(aux);
                 }
                 else
-                    System.out.println("\033[0;31m" + new String(reply1) + ": Falha ao apresentar coordenadas" + "\n\n\033[0m");
+                    System.out.println("\033[0;31m" + ": Falha ao encontrar trotinetes livres" + "\n\n\033[0m");
             }
             catch (NullPointerException | IOException | InterruptedException e) {
                 System.out.print(e.getMessage() + "\n\n");
