@@ -241,9 +241,7 @@ public class App {
         boolean b = false;
         try {
             this.writlock.lock();
-            System.out.println(codigo);
             for (Trotinete t: this.trotinetes){
-                System.out.println(t.getId());
                 if (t.getId()==codigo){
                     List<Trotinete> trotinetes = this.mapa.get(t.getCorY()).get(t.getCorX());
                     for(Trotinete ts:trotinetes){
@@ -259,6 +257,7 @@ public class App {
                     this.mapa.get(y).get(x).add(t);
                     b = true;
                     System.out.println(b);
+                    break;
                 }
             }
         }finally {
