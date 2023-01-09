@@ -54,8 +54,29 @@ public class Text2UI {
     private void trataPedirNotificacoes() {
     }
 
-    private void trataEstacionar() {
+   private void trataEstacionar() throws InterruptedException {
+        Thread t = new Thread(() -> {
+            try{
+                System.out.println("Insira as suas coordenadas: ");
+                String coordenadas = scin.nextLine();
+                multi.send(6,(coordenadas + " " + this.senha).getBytes());
+                byte[] reply = multi.receive(5);
+                int error = Integer.parseInt(new String(reply));
+                System.out.println("\n\n");
+                if(error==0){
+                    byte[] reply1 = multi.receive(5);
+                    String preco = new String(reply1);
+                    System.out.println("O valor da viagem é: " + preco);
+                }
 
+
+            }
+            catch(NullPointerException | IOException | InterruptedException e){
+            }
+
+        });
+        t.start();
+        t.join();
     }
 
     public void trataTrotinetesLivres() throws InterruptedException {
