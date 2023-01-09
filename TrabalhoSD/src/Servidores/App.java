@@ -37,12 +37,16 @@ public class App {
     public void adiciona_trotinete(Trotinete t){
         int x = t.getCorX();
         int y = t.getCorY();
-        try {
-            this.writlock.lock();
-            trotinetes.add(t);
-            mapa.get(y).get(x).add(t);
-        }finally {
-            this.writlock.unlock();
+        if(x >= 0 && x < this.tamanho && y >= 0 && y < this.tamanho){
+            try {
+                this.writlock.lock();
+                trotinetes.add(t);
+                mapa.get(y).get(x).add(t);
+            }finally {
+                this.writlock.unlock();
+            }
+        }else {
+            System.out.println("cordenadas invalidas");
         }
     }
     public List<List<Integer>> trotinetes_livres(int x,int y){
@@ -239,29 +243,36 @@ public class App {
     public List<Integer> liverta_trotinete(int x, int y,int codigo) {
         List<Integer>cords = new ArrayList<>();
         boolean b = false;
-        try {
-            this.writlock.lock();
-            for (Trotinete t: this.trotinetes){
-                if (t.getId()==codigo){
-                    List<Trotinete> trotinetes = this.mapa.get(t.getCorY()).get(t.getCorX());
-                    for(Trotinete ts:trotinetes){
-                        if(ts.getId()==codigo){
-                            ts.setLivre(true);
-                            break;
+        if (x>=0 && y>=0 && x<this.tamanho && y<this.tamanho) {
+            try {
+                this.writlock.lock();
+                System.out.println(codigo);
+                for (Trotinete t : this.trotinetes) {
+                    System.out.println(t.getId());
+                    if (t.getId() == codigo) {
+                        List<Trotinete> trotinetes = this.mapa.get(t.getCorY()).get(t.getCorX());
+                        for (Trotinete ts : trotinetes) {
+                            if (ts.getId() == codigo) {
+                                ts.setLivre(true);
+                                break;
+                            }
                         }
+                        int X = t.getCorX();
+                        int Y = t.getCorY();
+                        cords.add(X);
+                        cords.add(Y);
+                        this.mapa.get(Y).get(X).remove(t);
+                        t.setCorX(x);
+                        t.setCorY(y);
+                        this.mapa.get(y).get(x).add(t);
+                        b = true;
+                        System.out.println(b);
+                        break;
                     }
-                    int X = t.getCorX();int Y = t.getCorY();
-                    cords.add(X);cords.add(Y);
-                    this.mapa.get(Y).get(X).remove(t);
-                    t.setCorX(x);t.setCorY(y);
-                    this.mapa.get(y).get(x).add(t);
-                    b = true;
-                    System.out.println(b);
-                    break;
                 }
+            } finally {
+                this.writlock.unlock();
             }
-        }finally {
-            this.writlock.unlock();
         }
         if (b) return cords;
         return null;
