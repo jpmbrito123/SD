@@ -64,13 +64,12 @@ public class Text2UI {
     }
 
     private void trataDesativarNotificacoes() {
-        this.thread.start();
         try {
             multi.send(8,"Desativar Notificacao".getBytes());
             byte[] reply = multi.receive(8);
             int error = Integer.parseInt(new String(reply));
             if(error==0){
-                this.thread.join();
+                this.thread.interrupt();
                 System.out.println("Notificaçoes desativadas");
             }
             else System.out.println("\033[0;31m" + ": Falha ao desativar notificacoes" + "\n\n\033[0m");
