@@ -1,6 +1,9 @@
 package Servidores;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -72,6 +75,7 @@ public class App {
     public void recompensas(List<List<Integer>> A,List<List<Integer>> B){
         List<Trotinete> trotinetes;
         try {
+            this.readlock.lock();
             for(int y=0;y<this.tamanho;y++){
                 for(int x=0;x<this.tamanho;x++){
                     trotinetes = this.mapa.get(y).get(x);
@@ -116,8 +120,10 @@ public class App {
 
     }
 
-    public int reserva_trotinete(int x ,int y){
+    public String reserva_trotinete(int x ,int y){
         Trotinete t = null;
+        int codigo = -1;
+        String reserva = "";
         try {
             this.writlock.lock();
             if (x >= 0 && x < this.tamanho && y >= 0 && y < this.tamanho) {
@@ -141,12 +147,18 @@ public class App {
                     if (t != null) break;
                 }
             }
-            int codigo = -1;
             if (t != null) codigo = t.getId();
-            return codigo;
         }finally {
             this.writlock.unlock();
         }
+        reserva = reserva + codigo;
+        if (codigo!=-1){
+            Date dataHoraAtual = new Date();
+            String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
+            String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+            reserva = reserva +" "+ data+hora;
+        }
+        return reserva;
     }
 
     public void liverta_trotinete(int x, int y,int codigo) {

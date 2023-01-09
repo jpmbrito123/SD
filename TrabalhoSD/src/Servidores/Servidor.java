@@ -63,21 +63,26 @@ public class Servidor {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
                     int y = parseInt(tokens[1]);
-                    int codigo = -1;
+                    String reserva = "";
                     try {
                         this.writel.lock();
                         while (atualiza){
                             this.atualizou.await();
                         }
                         this.atualiza = true;
-                        codigo = this.aplication.reserva_trotinete(x,y);
+                        reserva = this.aplication.reserva_trotinete(x,y);
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
                         this.writel.unlock();
                     }
-                    c.send(5,Integer.toString(codigo).getBytes());
+                    if(reserva.compareTo("-1")==0){
+                        c.send(5,Integer.toString(-1).getBytes());
+                    }else {
+                        c.send(5,Integer.toString(0).getBytes());
+                        c.send(5,reserva.getBytes());
+                    }
                 } else if (frame.tag == 6) {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);

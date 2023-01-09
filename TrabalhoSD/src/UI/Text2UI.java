@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 public class Text2UI {
 
-
-    private IClientesFacade modelUtilizador;
     // Menus da aplicação
     private Menu menu;
 
