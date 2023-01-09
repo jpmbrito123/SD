@@ -59,6 +59,14 @@ public class Servidor {
                         c.send(3,resposta.getBytes());
                     }else c.send(3,Integer.toString(-1).getBytes());
                 }else if(frame.tag == 4){
+                    String[] tokens = data.split(" ");
+                    int x =  parseInt(tokens[0]);
+                    int y = parseInt(tokens[1]);
+                    String recompensas = aplication.recompensas_na_areas(x,y);
+                    if (recompensas.compareTo("")!=0){
+                        c.send(4,Integer.toString(0).getBytes());
+                        c.send(4,recompensas.getBytes());
+                    }else c.send(4,Integer.toString(-1).getBytes());
                 } else if (frame.tag == 5) {
                     String[] tokens = data.split(" ");
                     int x =  parseInt(tokens[0]);
