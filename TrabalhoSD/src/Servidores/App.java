@@ -236,7 +236,8 @@ public class App {
         return reserva;
     }
 
-    public boolean liverta_trotinete(int x, int y,int codigo) {
+    public List<Integer> liverta_trotinete(int x, int y,int codigo) {
+        List<Integer>cords = new ArrayList<>();
         boolean b = false;
         try {
             this.writlock.lock();
@@ -249,7 +250,10 @@ public class App {
                             break;
                         }
                     }
-                    this.mapa.get(t.getCorY()).get(t.getCorX()).remove(t);
+                    int X = t.getCorX();int Y = t.getCorY();
+                    cords.add(X);cords.add(Y);
+                    this.mapa.get(Y).get(X).remove(t);
+                    t.setCorX(x);t.setCorY(y);
                     this.mapa.get(y).get(x).add(t);
                     b = true;
                     break;
@@ -258,7 +262,8 @@ public class App {
         }finally {
             this.writlock.unlock();
         }
-        return b;
+        if (b) return cords;
+        return null;
     }
     public String trotinetesToString(List<List<Integer>> l){
         StringBuilder s = new StringBuilder();

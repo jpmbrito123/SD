@@ -5,7 +5,10 @@ import Clientes.TaggedConnection;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.*;
@@ -103,7 +106,8 @@ public class Servidor {
                     int y = parseInt(tokens[1]);
                     String reserva = tokens[2];
                     String[] reserva_tokens = reserva.split(" ");
-                    boolean b =false;
+                    List<Integer> cors_ant = null;
+                    boolean recompensa= false;
                     try {
                         this.lock.lock();
                         this.re_es++;
@@ -112,15 +116,31 @@ public class Servidor {
                         }
                         this.atualiza = true;
                         this.re_es--;
-                        b = this.aplication.liverta_trotinete(x,y,Integer.parseInt(reserva_tokens[0]));
+                        cors_ant = this.aplication.liverta_trotinete(x,y,Integer.parseInt(reserva_tokens[0]));
+                        if (cors_ant != null) {
+                            for(List<Integer>as:A){
+                                if(as.get(0)==cors_ant.get(0) && as.get(1)==as.get(1)){
+                                    for(List<Integer>bs:B){
+                                        if(bs.get(0)==x && bs.get(1)==y){
+                                            recompensa = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         this.pode_atualizar.signalAll();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     } finally {
                         this.lock.unlock();
                     }
-                    if (b){//falta pagamento
+                    if (cors_ant!=null){
+                        int distancia = abs(cors_ant.get(0)-x) + abs(cors_ant.get(1)-y);
+                        long tempo = getDifferenceInMinutes(tokens[3]+tokens[4]);
+                        double preco= tempo * 0.1 + distancia * 0.1;
+                        if (recompensa) preco = preco*0.8;
                         c.send(6,"0".getBytes());
+                        c.send(6,Double.toString(preco).getBytes());
                     }else c.send(6,"-1".getBytes());
                 } else if (frame.tag == 7) {
                     if (espera_notificacao == null){
@@ -191,6 +211,20 @@ public class Servidor {
                 lock.lock();
             }
         }
+    }
+
+    public long getDifferenceInMinutes(String date) {
+        SimpleDateFormat format = new SimpleDateFormat("ss/mm/HH dd/MM/yyyy");
+        Date d = null;
+        try {
+            d = format.parse(date);
+        } catch (ParseException e) {
+            // Tratamento da exceção
+            System.out.println("Erro ao converter a string para data: " + e.getMessage());
+            return -1;
+        }
+        long diff = new Date().getTime() - d.getTime();
+        return diff / (60 * 1000) % 60;
     }
 
     public void start() throws IOException {

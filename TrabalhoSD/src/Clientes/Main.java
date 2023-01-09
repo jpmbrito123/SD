@@ -13,5 +13,6 @@ public class Main {
         Cliente c = new Cliente("","",multi);
         multi.start();
         new Text2UI(multi).run();
+        socket.close();
     }
 }

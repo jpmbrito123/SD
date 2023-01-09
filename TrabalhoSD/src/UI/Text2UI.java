@@ -61,18 +61,19 @@ public class Text2UI {
                 System.out.println("Insira as suas coordenadas: ");
                 String coordenadas = scin.nextLine();
                 multi.send(6,(coordenadas + " " + this.senha).getBytes());
-                byte[] reply = multi.receive(5);
+                byte[] reply = multi.receive(6);
                 int error = Integer.parseInt(new String(reply));
                 System.out.println("\n\n");
                 if(error==0){
-                    byte[] reply1 = multi.receive(5);
+                    byte[] reply1 = multi.receive(6);
                     String preco = new String(reply1);
                     System.out.println("O valor da viagem é: " + preco);
                 }
 
 
             }
-            catch(NullPointerException | IOException | InterruptedException e){
+            catch(NullPointerException | IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
         });
